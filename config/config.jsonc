@@ -3,24 +3,24 @@
     // Requirements: ColorConverterAPI: https://forge.sp-tarkov.com/mod/1090/color-converter-api
 
     // Change all tracer colors
-    "modEnabled": true, // true/false - default: true
+    "ModEnabled": true, // true/false - default: true
     // Changing this value to false will disable the mod
 
     // Use background colors for coloring tracers
-    "useBackgroundColors": false, // true/false - default: false
+    "UseBackgroundColors": false, // true/false - default: false
     // Some mods (eg. RaiRaiTheRaichu-AmmoStats) are coloring backgrounds of bullets, so we can use them to color tracers
     // This only works if mod that is coloring backgrounds is also using ColorConverterAPI
 
     // Random color of bullet tracer, every time you are restarting the server
-    "randomMode": false, // true/false - default: false
+    "RandomMode": false, // true/false - default: false
 
     // Change all tracers to have the same color - use hex value
-    "sameColor": false, // true/false - default: false
-    "sameColorValue": "#A10000", // color hex value
+    "SameColor": false, // true/false - default: false
+    "SameColorValue": "#A10000", // color hex value
 
     // Change all tracers to have the same color using default tracer colors
-    "sarynMode": false, // true/false - default: false
-    "sarynModeColor": "green",  // green/red/blue
+    "SarynMode": false, // true/false - default: false
+    "SarynModeColor": "green",  // green/red/blue
     // Changing only this option to true is disabling a requirement of ColorConverterAPI
 
     // Select a color profile/customize a profile here.

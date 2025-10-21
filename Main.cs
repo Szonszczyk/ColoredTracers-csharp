@@ -3,18 +3,18 @@ using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
-using SPTarkov.Server.Core.Models.Eft.Game;
 using SPTarkov.Server.Core.Models.Logging;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Utils;
 using System.Text.RegularExpressions;
 
 namespace ColoredTracers;
 
 [Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 73133)]
-public class ColoredTracers(ISptLogger<ColoredTracers> logger, DatabaseService databaseService, ModHelper modHelper) : IOnLoad
+public class ColoredTracers(ISptLogger<ColoredTracers> logger, DatabaseService databaseService, ModHelper modHelper, JsonUtil jsonUtil) : IOnLoad
 {
-    private readonly ConfigLoader _configLoader = new(modHelper);
+    private readonly ConfigLoader _configLoader = new(modHelper, jsonUtil);
     private readonly string ModName = "ColoredTracers";
     private static readonly string[] defaultTracerColors = ["green", "red", "blue"];
     private static readonly string[] bulletTypes = ["grenade", "bullet", "buckshot"];

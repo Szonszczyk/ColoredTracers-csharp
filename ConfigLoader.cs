@@ -1,18 +1,18 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Text.Json;
-using System.Text.RegularExpressions;
+﻿using System.Reflection;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Utils;
 
 namespace ColoredTracers
 {
     public class ConfigLoader
     {
         private readonly string _configPath;
+        private readonly JsonUtil _jsonUtil;
 
-        public ConfigLoader(ModHelper modHelper)
+        public ConfigLoader(ModHelper modHelper, JsonUtil jsonUtil)
         {
+            _jsonUtil = jsonUtil ?? throw new ArgumentNullException(nameof(jsonUtil));
+
             string modFolder = modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly());
             _configPath = Path.Combine(modFolder, "config", "config.jsonc");
         }
@@ -22,16 +22,15 @@ namespace ColoredTracers
             if (!File.Exists(_configPath))
                 throw new FileNotFoundException($"Config file not found at {_configPath}");
 
-            string jsonc = File.ReadAllText(_configPath);
+            string jsonContent = File.ReadAllText(_configPath);
 
-            // Remove // and /* */ comments before parsing
-            string cleanedJson = Regex.Replace(jsonc, @"\/\/.*|\/\*[\s\S]*?\*\/", "");
+            // JsonUtil automatically handles JSONC (comments, etc.)
+            T? config = _jsonUtil.Deserialize<T>(jsonContent);
 
-            return JsonSerializer.Deserialize<T>(cleanedJson, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                ReadCommentHandling = JsonCommentHandling.Skip
-            }) ?? throw new InvalidOperationException("Failed to deserialize config.");
+            if (config == null)
+                throw new InvalidOperationException($"Failed to deserialize config file at {_configPath}");
+
+            return config;
         }
     }
 }
