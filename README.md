@@ -7,6 +7,7 @@ ColorConverAPI is required to work.
 ## Compatibility with SPT versions
 
 4.0.* - current version
+https://forge.sp-tarkov.com/mod/2037/colored-tracers
 
 ## Suggestions Questions
 
