@@ -1,0 +1,67 @@
+{
+    // Welcome to the config of Colored Tracers by Szonszczyk
+    // Requirements: ColorConverterAPI: https://forge.sp-tarkov.com/mod/1090/color-converter-api
+
+    "ModEnabled": true, // true/false - default: true
+    // Changing this value to false will disable the mod
+
+    // Choose tracer mode
+    // IMPORTANT:
+    // Only ONE mode should be enabled at a time
+    // If multiple ModeEnabled options are set to true, the last one processed will override the others
+    "Tracers": {
+        // Color based on penetration value
+        "PenetrationValueModeEnabled": true, // true/false - default: true
+        // Any other "ModeEnabled" field set to "true" will override this mode
+
+        // Color based on bullet rating (overall rating calculated from multiple stats, see bottom of the config)
+        "BulletRatingModeEnabled": false, // true/false - default: false
+
+        // Makes all tracers use the same color
+        "SameColorModeEnabled": false, // true/false - default: false
+        "SameColorValue": "#FFE599", // color hex value or green/red/blue
+
+        // Each tracer gets a random color every time you restart the server
+        "RandomModeEnabled": false // true/false - default: false
+    },
+
+    // Choose background color
+    // If multiple ModeEnabled options are set to true, the last one processed will override the others
+    "BackgroundColor": {
+        // Color based on penetration value
+        "PenetrationValueModeEnabled": false, // true/false - default: false
+
+        // Color based on bullet rating
+        "BulletRatingModeEnabled": false // true/false - default: false
+    },
+
+    // Advanced settings
+    "Logic": {
+        // If a tracer/background color is already a hex value (changed by another mod),
+        // overwrite it with the new value
+        "OverwriteHexColors": false,
+
+        // Weights for determining bullet rating
+        // These can be changed to suit your preferences
+        // Properties can be found at https://db.sp-tarkov.com/search/
+        // Property names must start with an uppercase letter
+        "RatingWeights": {
+            "bullet": { // Normal bullets
+                "Damage": 75,
+                "PenetrationPower": 100,
+                "InitialSpeed": 50
+            },
+            "buckshot": { // Buckshot bullets
+                "Damage": 75,
+                "PenetrationPower": 100,
+                "InitialSpeed": 20,
+                "BuckshotBullets": 75
+            },
+            "grenade": { // Explosive bullets for grenade launchers
+                "FuzeArmTimeSec": -50, // Lower arm time = higher rating, so this value is negative
+                "ExplosionStrength": 100,
+                "Damage": 75
+            }
+        }
+    }
+}
