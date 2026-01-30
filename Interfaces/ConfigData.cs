@@ -6,6 +6,8 @@
         public TracersConfigData Tracers { get; set; } = new TracersConfigData();
         public BackgroundColorConfigData BackgroundColor { get; set; } = new BackgroundColorConfigData();
         public LogicConfigData Logic { get; set; } = new LogicConfigData();
+
+        public bool VerifyColorConverterAPI { get; set; } = true;
     }
     public class TracersConfigData
     {

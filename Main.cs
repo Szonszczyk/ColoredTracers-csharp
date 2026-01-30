@@ -18,15 +18,15 @@ public class ColoredTracers(
 {
     public Task OnLoad()
     {
-        if (!IsPluginLoaded())
+        ConfigLoader configLoader = new(logger, modHelper);
+        var config = configLoader.Config;
+        if (config.ModEnabled == false) return Task.CompletedTask;
+
+        if (!IsPluginLoaded() && config.VerifyColorConverterAPI)
         {
             logger.LogWithColor($"[{GetType().Namespace}] Mod failed to load because ColorConverterAPI is missing from BepInEx/plugins folder. You can download it at this link: https://forge.sp-tarkov.com/mod/1090/color-converter-api", LogTextColor.Red);
             return Task.CompletedTask;
         }
-
-        ConfigLoader configLoader = new(logger, modHelper);
-        var config = configLoader.Config;
-        if (config.ModEnabled == false) return Task.CompletedTask;
 
         CustomBulletsManager customBulletsManager = new(logger, configLoader, databaseService);
 

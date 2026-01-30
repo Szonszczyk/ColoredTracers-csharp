@@ -63,5 +63,6 @@
                 "Damage": 75
             }
         }
-    }
+    },
+    "VerifyColorConverterAPI": true
 }
