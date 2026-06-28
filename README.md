@@ -6,11 +6,11 @@ Server mod for Single Player Tarkov (SPT) adding colored tracers to every ammo i
 Dependency: [ColorConverterAPI](https://forge.sp-tarkov.com/mod/1090/color-converter-api)
 
 ## Features
-- Coloring tracers:\
-	- Based on either bullet damage or penetration\
-	- With linear rainbow color scale (red-worst, violet-best)\
-	- With 7-steps color profile with rainbow or customizable colors\
-	- Single color that can be added based on bullet category\
+- Coloring tracers:
+	- Based on either bullet damage or penetration
+	- With linear rainbow color scale (red-worst, violet-best)
+	- With 7-steps color profile with rainbow or customizable colors
+	- Single color that can be added based on bullet category
 - Option to invert scales (violet-worst, red-best)
 - Option to color bullet to random color
 
