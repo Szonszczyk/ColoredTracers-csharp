@@ -1,4 +1,5 @@
 using ColoredTracers.CustomClasses;
+using ColoredTracers.Interfaces;
 using ColoredTracers.Loaders;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
@@ -9,7 +10,7 @@ using SPTarkov.Server.Core.Services;
 
 namespace ColoredTracers;
 
-[Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 97023)]
+[Injectable(TypePriority = OnLoadOrder.PostSptModLoader + 3)]
 public class ColoredTracers(
     ISptLogger<ColoredTracers> logger,
     DatabaseService databaseService,
@@ -28,61 +29,89 @@ public class ColoredTracers(
             return Task.CompletedTask;
         }
 
-        CustomBulletsManager customBulletsManager = new(logger, configLoader, databaseService);
-
-        var tracerConfig = config.Tracers;
-        var bgConfig = config.BackgroundColor;
+        CustomBulletsManager customBulletsManager = new(logger, databaseService);
         customBulletsManager.LoadBullets();
 
-        string? bgModeDescription = null;
-        string? bgMode = null;
-        if (bgConfig.PenetrationValueModeEnabled)
+        var maxValue = config.BasedOn switch
         {
-            bgModeDescription = "colors based on penetration value";
-            bgMode = "penetration";
-        }
-        else if (bgConfig.BulletRatingModeEnabled)
+            BasedOnType.Penetration => config.MaxValues.Penetration,
+            BasedOnType.Damage => config.MaxValues.Damage,
+            _ => config.MaxValues.Penetration
+        };
+
+        var colorProfile = config.ColorProfile switch
         {
-            bgModeDescription = "colors based on bullet rating";
-            bgMode = "rating";
+            ColorProfilesType.Custom => config.ColorProfiles.Custom,
+            ColorProfilesType.Rainbow => config.ColorProfiles.Rainbow,
+            _ => config.ColorProfiles.Rainbow
+        };
+        var colorProfileList = colorProfile.OrderBy(x => int.Parse(x.Key))
+                                           .Select(x => x.Value)
+                                           .ToList();
+        if (!config.UseColorScale && config.UseColorProfile)
+        {
+            if (!ValidateColorProfile(colorProfile))
+            {
+                logger.LogWithColor($"[{GetType().Namespace}] Color profile {config.ColorProfile} must be consecutive integers starting from 0!", LogTextColor.Red);
+                config.UseColorProfile = false;
+            }
         }
 
-        string? tracerModeDescription;
-        string? tracerMode;
-        string? tracerColor = null;
+        foreach (var (_, bullet) in customBulletsManager.bullets)
+        {
+            if (bullet is null) continue;
+            if (bullet.Tracer.Contains('#') && !config.OverwriteHexColors) continue;
 
-        if (tracerConfig.RandomModeEnabled)
-        {
-            tracerModeDescription = "random colors";
-            tracerMode = "random";
-            tracerColor = "random";
-        }
-        else if (tracerConfig.SameColorModeEnabled)
-        {
-            tracerModeDescription = $"same color {tracerConfig.SameColorValue}";
-            tracerMode = "same";
-            tracerColor = tracerConfig.SameColorValue;
-        }
-        else if (tracerConfig.BulletRatingModeEnabled)
-        {
-            tracerModeDescription = "colors based on bullet rating";
-            tracerMode = "rating";
-        }
-        else
-        {
-            tracerModeDescription = "colors based on penetration value";
-            tracerMode = "penetration";
+            if (config.RandomModeEnabled)
+            {
+                customBulletsManager.ColorTracer(bullet, PickColor.GetRandomHexColor());
+                continue;
+            }
+
+            if (config.UseSingleColor.Enabled)
+            {
+                config.UseSingleColor.Types.TryGetValue(bullet.Type, out var bulletTypeConfig);
+                if (bulletTypeConfig != null && bulletTypeConfig.Enabled)
+                {
+                    customBulletsManager.ColorTracer(bullet, bulletTypeConfig.Color);
+                    continue;
+                }
+            }
+            double? nowValue = config.BasedOn switch
+            {
+                BasedOnType.Penetration => bullet.tmpItem?.Properties?.PenetrationPower,
+                BasedOnType.Damage => bullet.tmpItem?.Properties?.Damage,
+                _ => bullet.tmpItem?.Properties?.PenetrationPower
+            };
+            if (!nowValue.HasValue) continue;
+            
+            if (config.InvertScale)
+            {
+                nowValue = maxValue - Math.Min((int)nowValue, maxValue);
+            }
+
+            if (config.UseColorScale)
+            {
+                customBulletsManager.ColorTracer(bullet, RainbowColorHasher.GetColor((int)nowValue, maxValue));
+                continue;
+            }
+            if (config.UseColorProfile)
+            {
+                double percentage = (double)nowValue / maxValue;
+
+                int colorIndex = Math.Min(
+                    (int)(percentage * colorProfileList.Count),
+                    colorProfileList.Count - 1
+                );
+                customBulletsManager.ColorTracer(bullet, colorProfileList[colorIndex]);
+            }
         }
 
-        customBulletsManager.ColorTracersAndBackgrounds(bgMode, tracerMode, tracerColor);
-        if (tracerModeDescription is not null)
-            logger.LogWithColor($"[{GetType().Namespace}] Added {tracerModeDescription} tracers to {customBulletsManager.tracersChanged} bullets!", LogTextColor.Green);
-        if (bgModeDescription is not null)
-            logger.LogWithColor($"[{GetType().Namespace}] Changed background {bgModeDescription} for {customBulletsManager.bgChanged} bullets!", LogTextColor.Green);
-
+        if (customBulletsManager.TracersChanged > 0)
+            logger.LogWithColor($"[{GetType().Namespace}] Added {customBulletsManager.TracersChanged} tracers to {customBulletsManager.bullets.Count} bullets!", LogTextColor.Green);
         return Task.CompletedTask;
     }
-    public static bool IsPluginLoaded()
+    private static bool IsPluginLoaded()
     {
         const string pluginName = "rairai.colorconverterapi.dll";
         const string pluginsPath = "../BepInEx/plugins";
@@ -102,4 +131,18 @@ public class ColoredTracers(
             return false;
         }
     }
+
+    private static bool ValidateColorProfile(Dictionary<string, string> colorProfile)
+    {
+        var expectedKeys = Enumerable.Range(0, colorProfile.Count);
+
+        bool valid = expectedKeys.SequenceEqual(
+            colorProfile.Keys
+                .Select(int.Parse)
+                .OrderBy(x => x)
+        );
+
+        return valid;
+    }
+
 }

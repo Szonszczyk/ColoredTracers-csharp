@@ -14,8 +14,8 @@ namespace ColoredTracers.Loaders
         {
             string modFolder = modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly());
             string configDir = Path.Combine(modFolder, "config");
-            string configPath = Path.Combine(configDir, "config.jsonc");
-            string defaultConfigPath = Path.Combine(configDir, "defaultConfig.jsonc");
+            string configPath = Path.Combine(configDir, "config.json");
+            string defaultConfigPath = Path.Combine(configDir, "defaultConfig.json");
 
             try
             {
@@ -24,12 +24,12 @@ namespace ColoredTracers.Loaders
                 {
                     if (File.Exists(defaultConfigPath))
                     {
-                        logger.LogWithColor($"[{GetType().Namespace}] Config file not found. Copying defaultConfig.jsonc to config.jsonc...", LogTextColor.Yellow);
+                        logger.LogWithColor($"[{GetType().Namespace}] Config file not found. Copying defaultConfig.json to config.jsonc...", LogTextColor.Yellow);
                         File.Copy(defaultConfigPath, configPath);
                     }
                     else
                     {
-                        logger.LogWithColor($"[{GetType().Namespace}] Neither config.jsonc nor defaultConfig.jsonc found in {configDir}. Using built-in defaults.", LogTextColor.Red);
+                        logger.LogWithColor($"[{GetType().Namespace}] Neither config.jsonc nor defaultConfig.json found in {configDir}. Using built-in defaults.", LogTextColor.Red);
                         Config = new ConfigData();
                         return;
                     }
@@ -46,7 +46,7 @@ namespace ColoredTracers.Loaders
                 }
 
                 Config = config;
-                logger.LogWithColor($"[{GetType().Namespace}] Config loaded successfully.", LogTextColor.Green);
+                //logger.LogWithColor($"[{GetType().Namespace}] Config loaded successfully.", LogTextColor.Green);
             }
             catch (Exception ex)
             {

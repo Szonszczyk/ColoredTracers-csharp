@@ -1,0 +1,79 @@
+{
+  // Welcome to the config of Colored Tracers by Szonszczyk
+  // Dependency: ColorConverterAPI: https://forge.sp-tarkov.com/mod/1090/color-converter-api
+
+  "ModEnabled": true, // true/false - default: true
+  // Changing this value to false will disable the mod
+
+  // Priority order:
+  // 1. UseSingleColor
+  // 2. UseColorProfile
+  // 3. UseColorScale
+
+  // Add color from a linear rainbow scale
+  "UseColorScale": true, // true/false - default: true
+  // Property used for color calculation (when UseColorScale or UseColorProfile is enabled)
+  "BasedOn": "Penetration", //Penetration/Damage - default: "Penetration"
+  // Maximum property value used for color calculation
+  // Values above this threshold will be treated as this value
+  "MaxValues": {
+    "Penetration": 65,
+    "Damage": 100
+  },
+
+  // Use predefined color ranges instead of a smooth color scale
+  // If enabled, this option overrides UseColorScale
+  "UseColorProfile": false, // true/false - default: false
+  "ColorProfile": "Rainbow", // Custom/Rainbow - default: "Rainbow"
+  "ColorProfiles": {
+    "Custom": { // Customize this profile and set ColorProfile to "Custom" to use it
+      "0": "#A10000", // Color steps from worst (0) to best (6)
+      "1": "#A10000",
+      "2": "#A15000",
+      "3": "#A1A100",
+      "4": "#416600",
+      "5": "#008282",
+      "6": "#6A006A"
+    },
+    "Rainbow": { // Please don't change this!
+      "0": "#A10000",
+      "1": "#A10000",
+      "2": "#A15000",
+      "3": "#A1A100",
+      "4": "#416600",
+      "5": "#008282",
+      "6": "#6A006A"
+    }
+  },
+
+  // Use a single color instead of a color scale
+  // This option takes priority over all other coloring options
+  // Categories with Enabled set to true will use a single color
+  "UseSingleColor": {
+    // Enables single-color mode for categories marked as Enabled
+    "Enabled": true, // true/false - default: true
+    "Types": {
+      "bullet": { // Standard ammunition
+        "Enabled": false, // true/false - default: false
+        "Color": "#29A3FF" // color hex value or green/red/blue
+      },
+      "buckshot": { // Buckshot bullets
+        "Enabled": false, // true/false - default: false
+        "Color": "#A10000" // color hex value or green/red/blue
+      },
+      "grenade": { // Grenade launcher ammunition
+        "Enabled": true, // true/false - default: true
+        "Color": "#A8A8A8" // color hex value or green/red/blue
+      }
+    }
+  },
+  // Reverse the color scale (violet = lowest value, red = highest value)
+  "InvertScale": false,
+  // Assigns random colors to tracers when the server starts
+  "RandomModeEnabled": false,
+  // Overwrite existing hex colors applied by other mods
+  "OverwriteHexColors": false,
+  // Verify that ColorConverterAPI is installed
+  // Disable this only if you intentionally want to skip the dependency check
+  "VerifyColorConverterAPI": true
+}
